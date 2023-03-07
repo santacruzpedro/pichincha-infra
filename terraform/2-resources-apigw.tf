@@ -95,3 +95,9 @@ resource "aws_api_gateway_deployment" "api_deployment" {
   stage_name        = var.stage_name
   stage_description = "Deployed at ${var.stage_deployed_at}"
 }
+
+####
+resource "aws_api_gateway_api_key" "pichincha_apikey" {
+  name = "pichincha-apikey-${var.environment}"
+  value =local.pichincha_apikey.apitoken
+}
