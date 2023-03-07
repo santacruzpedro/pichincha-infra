@@ -52,7 +52,7 @@ resource "aws_api_gateway_integration" "pichincha_integration" {
   resource_id             = each.value.resource_id
   http_method             = each.value.http_method
   integration_http_method = "POST"
-  type                    = "AWS_PROXY"
+  type                    = "AWS"
   uri                     = aws_lambda_function.lambda_functions_client[each.key].invoke_arn
 }
 
