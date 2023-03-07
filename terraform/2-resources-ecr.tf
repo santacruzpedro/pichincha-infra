@@ -1,6 +1,6 @@
 resource "aws_ecr_repository" "post" {
   for_each = var.lambdas_client_post
-  name     = "pichincha_${each.value.path}"
+  name     = "pichincha-${each.value.path}"
   image_scanning_configuration {
     scan_on_push = true
   }
