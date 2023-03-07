@@ -5,7 +5,7 @@ locals {
     Environment = var.environment
     platform    = "pichincha"
   }
- # pichincha_apikey = jsondecode(data.aws_secretsmanager_secret_version.pichincha_apikey.secret_string)
+ pichincha_apikey = jsondecode(data.aws_secretsmanager_secret_version.pichincha_apikey.secret_string)
 }
 provider "aws" {
   region = var.region
@@ -13,6 +13,6 @@ provider "aws" {
 
 data "aws_caller_identity" "current" {}
 
-#data "aws_secretsmanager_secret_version" "pichincha_apikey" {
-#  secret_id = "${var.environment}/pichincha${var.environment}/apitoken"
-#}
+data "aws_secretsmanager_secret_version" "pichincha_apikey" {
+  secret_id = "${var.environment}/pichincha-${var.environment}/apitoken"
+}
