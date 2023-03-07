@@ -46,6 +46,14 @@ resource "aws_api_gateway_method" "pichincha_method" {
   api_key_required = true
 }
 
+resource "aws_api_gateway_method" "method_cors_pichincha" {
+  for_each      = aws_api_gateway_resource.pichincha_resource
+  rest_api_id   = aws_api_gateway_rest_api.pichincha_apigw.id
+  resource_id   = each.value.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
 resource "aws_api_gateway_integration" "pichincha_integration" {
   for_each                = aws_api_gateway_method.pichincha_method
   rest_api_id             = each.value.rest_api_id
@@ -54,6 +62,22 @@ resource "aws_api_gateway_integration" "pichincha_integration" {
   integration_http_method = "POST"
   type                    = "AWS"
   uri                     = aws_lambda_function.lambda_functions_client[each.key].invoke_arn
+}
+
+resource "aws_api_gateway_integration" "integration_cors_backoffice" {
+  for_each    = aws_api_gateway_method.method_cors_pichincha
+  rest_api_id = each.value.rest_api_id
+  resource_id = each.value.resource_id
+  http_method = each.value.http_method
+  type        = "MOCK"
+  request_templates = {
+    "application/json" = <<EOF
+{
+      "statusCode": 200
+}
+EOF
+  }
+  depends_on = [aws_api_gateway_method.method_cors_pichincha]
 }
 
 resource "aws_api_gateway_method_response" "method_response_client" {
@@ -70,6 +94,23 @@ resource "aws_api_gateway_method_response" "method_response_client" {
   }
 }
 
+resource "aws_api_gateway_method_response" "method_cors_pichincha" {
+  for_each    = aws_api_gateway_method.pichincha_method
+  rest_api_id = each.value.rest_api_id
+  resource_id = each.value.resource_id
+  http_method = each.value.http_method
+  status_code = "200"
+  response_models = {
+    "application/json" = "Empty"
+  }
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true,
+    "method.response.header.Access-Control-Allow-Methods" = true,
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
+  depends_on = [aws_api_gateway_method.pichincha_method]
+}
+
 resource "aws_api_gateway_integration_response" "integration_response_client" {
   for_each    = aws_api_gateway_method_response.method_response_client
   rest_api_id = each.value.rest_api_id
@@ -83,6 +124,20 @@ resource "aws_api_gateway_integration_response" "integration_response_client" {
     aws_api_gateway_rest_api.pichincha_apigw,
     aws_api_gateway_integration.pichincha_integration
   ]
+}
+
+resource "aws_api_gateway_integration_response" "integration_cors_response_backoffice" {
+  for_each    = aws_api_gateway_method_response.method_cors_pichincha
+  rest_api_id = each.value.rest_api_id
+  resource_id = each.value.resource_id
+  http_method = each.value.http_method
+  status_code = each.value.status_code
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS,POST,PUT'",
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
+  depends_on = [aws_api_gateway_method_response.method_cors_pichincha]
 }
 
 resource "aws_api_gateway_deployment" "api_deployment" {
