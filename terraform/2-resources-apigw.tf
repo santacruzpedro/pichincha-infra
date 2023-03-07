@@ -95,7 +95,7 @@ resource "aws_api_gateway_method_response" "method_response_client" {
 }
 
 resource "aws_api_gateway_method_response" "method_cors_pichincha" {
-  for_each    = aws_api_gateway_method.pichincha_method
+  for_each    = aws_api_gateway_method.method_cors_pichincha
   rest_api_id = each.value.rest_api_id
   resource_id = each.value.resource_id
   http_method = each.value.http_method
@@ -108,7 +108,7 @@ resource "aws_api_gateway_method_response" "method_cors_pichincha" {
     "method.response.header.Access-Control-Allow-Methods" = true,
     "method.response.header.Access-Control-Allow-Origin"  = true
   }
-  depends_on = [aws_api_gateway_method.pichincha_method]
+  depends_on = [aws_api_gateway_method.method_cors_pichincha]
 }
 
 resource "aws_api_gateway_integration_response" "integration_response_client" {
