@@ -143,7 +143,8 @@ resource "aws_api_gateway_integration_response" "integration_cors_response_backo
 resource "aws_api_gateway_deployment" "api_deployment" {
   depends_on = [
     aws_api_gateway_rest_api.pichincha_apigw,
-    aws_api_gateway_integration.pichincha_integration
+    aws_api_gateway_integration.pichincha_integration,
+    aws_api_gateway_integration.integration_cors_backoffice
 
 ]
   rest_api_id       = aws_api_gateway_rest_api.pichincha_apigw.id
