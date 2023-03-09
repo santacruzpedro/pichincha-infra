@@ -181,7 +181,7 @@ resource "aws_api_gateway_authorizer" "apigw_authorizer" {
   authorizer_uri         = aws_lambda_function.pichincha_lambdas_function_authorizer.invoke_arn
   authorizer_credentials = aws_iam_role.invocation_authorizer_role.arn
   type = "REQUEST"
-  identity_source = "request.header.authorizationToken"
+  identity_source = "method.request.header.authorizationToken"
 }
 
 ### Lambda authorizer
