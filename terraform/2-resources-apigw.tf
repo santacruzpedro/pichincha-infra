@@ -193,3 +193,42 @@ resource "aws_lambda_function" "pichincha_lambdas_function_authorizer" {
   runtime       = "nodejs18.x"
 
 }
+
+resource "aws_iam_role" "invocation_authorizer_role" {
+  name = "invocation_authorizer_role"
+  path = "/"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "apigateway.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "invocation_authorizer_policy" {
+  name = "invocation_authorizer_policy"
+  role = aws_iam_role.invocation_authorizer_role.id
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "lambda:InvokeFunction",
+      "Effect": "Allow",
+      "Resource": "${aws_lambda_function.pichincha_lambdas_function_authorizer.arn}"
+    }
+  ]
+}
+EOF
+}
