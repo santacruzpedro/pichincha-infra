@@ -42,7 +42,8 @@ resource "aws_api_gateway_method" "pichincha_method" {
   rest_api_id      = aws_api_gateway_rest_api.pichincha_apigw.id
   resource_id      = each.value.id
   http_method      = "POST"
-  authorization    = "NONE"
+  authorization    = "CUSTOM"
+  authorizer_id = aws_api_gateway_authorizer.apigw_authorizer.id
   api_key_required = true
 }
 
@@ -171,4 +172,24 @@ resource "aws_api_gateway_usage_plan_key" "pichincha_api_usage_plan_key" {
   key_id        = "${aws_api_gateway_api_key.pichincha_apikey.id}"
   key_type      = "API_KEY"
   usage_plan_id = "${aws_api_gateway_usage_plan.pichincha_api_usage_plan.id}"
+}
+
+#### Authorizer
+resource "aws_api_gateway_authorizer" "apigw_authorizer" {
+  name                   = "apigw_authorizer-${var.environment}"
+  rest_api_id            = aws_api_gateway_rest_api.pichincha_apigw.id
+  authorizer_uri         = aws_lambda_function.pichincha_lambdas_function_authorizer.invoke_arn
+  authorizer_credentials = aws_iam_role.invocation_authorizer_role.arn
+  type = "REQUEST"
+  identity_source = "method.request.header.authorizationToken"
+}
+
+### Lambda authorizer
+resource "aws_lambda_function" "pichincha_lambdas_function_authorizer" {
+  filename      = "./lambda/authorizer.zip"
+  function_name = "pichincha-authorizer-${var.environment}"
+  role          = aws_iam_role.pichincha_lambdas.arn
+  handler       = "index.handler"
+  runtime       = "nodejs18.x"
+
 }
