@@ -67,10 +67,10 @@ jobs:
         id: plan
         run: terraform plan -no-color -var-file=../variables/${{ env.BRANCH }}.tfvars -out=terraform.out
 
-      - name: Terraform Apply
-        id: apply
-        run: terraform apply -auto-approve terraform.out
+      #- name: Terraform Apply
+      #  id: apply
+      #  run: terraform apply -auto-approve terraform.out
 
-      #- name: Terraform Destroy
-      #  id: destroy
-      #  run: terraform destroy -var-file=../variables/${{ env.BRANCH }}.tfvars -auto-approve
+      - name: Terraform Destroy
+        id: destroy
+        run: terraform destroy -var-file=../variables/${{ env.BRANCH }}.tfvars -auto-approve
