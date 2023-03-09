@@ -74,3 +74,8 @@ resource "aws_iam_policy" "pichincha_lambdas" {
 }
 EOF
 }
+
+resource "aws_iam_role_policy_attachment" "factoring_lambdas" {
+  role = aws_iam_role.pichincha_lambdas.name
+  policy_arn = aws_iam_policy.pichincha_lambdas.arn
+}
