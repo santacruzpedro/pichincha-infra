@@ -186,7 +186,7 @@ resource "aws_api_gateway_authorizer" "apigw_authorizer" {
 
 ### Lambda authorizer
 resource "aws_lambda_function" "pichincha_lambdas_function_authorizer" {
-  filename      = "./lambda/authorizer.zip"
+  filename      = "../lambda/authorizer.zip"
   function_name = "pichincha-authorizer-${var.environment}"
   role          = aws_iam_role.pichincha_lambdas.arn
   handler       = "index.handler"
