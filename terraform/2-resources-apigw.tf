@@ -205,7 +205,7 @@ resource "aws_iam_role" "invocation_authorizer_role" {
     {
       "Action": "sts:AssumeRole",
       "Principal": {
-        "Service": "apigateway.amazonaws.com"
+        "Service": "lambda.amazonaws.com"
       },
       "Effect": "Allow",
       "Sid": ""
